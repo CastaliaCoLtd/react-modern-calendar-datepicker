@@ -28,6 +28,7 @@ const Calendar = ({
   shouldHighlightWeekends,
   renderFooter,
   customDaysClassName,
+  getDisplayedDate,
 }) => {
   const calendarElement = useRef(null);
   const [mainState, setMainState] = useState({
@@ -42,11 +43,25 @@ const Calendar = ({
       /* istanbul ignore else */
       if (key === 'Tab') calendarElement.current.classList.remove('-noFocusOutline');
     };
-    calendarElement.current.addEventListener('keyup', handleKeyUp, false);
+
+    /* istanbul ignore else */
+    if (calendarElement.current !== null) {
+      calendarElement.current.addEventListener('keyup', handleKeyUp, false);
+    }
+
     return () => {
-      calendarElement.current.removeEventListener('keyup', handleKeyUp, false);
+      /* istanbul ignore else */
+      if (calendarElement.current !== null) {
+        calendarElement.current.removeEventListener('keyup', handleKeyUp, false);
+      }
     };
-  });
+  }, [calendarElement]);
+
+  useEffect(() => {
+    if (getDisplayedDate) {
+      getDisplayedDate(mainState.activeDate);
+    }
+  }, [mainState.activeDate]);
 
   const { getToday } = useLocaleUtils(locale);
   const { weekDays: weekDaysList, isRtl } = useLocaleLanguage(locale);
